@@ -1,0 +1,65 @@
+<!-- <!DOCTYPE html>
+<html lang="en"> -->
+    {% extends 'companyindex.html' %}
+    {% block content %}
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://kit.fontawesome.com/0d6c6c5ca8.js" crossorigin="anonymous"></script>
+
+
+</head>
+<body>
+    <div class="container-xxl py-5" id="joblist">
+        <div class="container">
+        
+                <h1 class="text-center mb-5 wow fadeInUp " data-wow-delay="0.1s">view Applications</h1>
+               
+          
+            {% for i in data %}
+            <div class="tab-class text-center wow fadeInUp" data-wow-delay="0.3s">
+                <div class="tab-content">
+                    <div id="tab-1" class="tab-pane fade show p-0 active">
+                        <div class="job-item p-4 mb-4">
+                            <div class="row g-4">
+                                <div class="col-sm-12 col-md-8 d-flex align-items-center">
+                                    <!-- <img class="flex-shrink-0 img-fluid border rounded" src="{% static 'img\com-logo-1.jpg' %}" alt="" style="width: 80px; height: 80px;"> -->
+                                    <div class="text-start ps-4">
+                                        <h6>Job Name : {{i.job.job_name}}</h6>
+                                        <h6><span class="text-truncate me-3 d-block "><i class="fa-solid fa-user me-2"></i>{{i.user_id.name}}</span></h6>
+                                        <h6><span class="text-truncate me-3"><i class="fa-solid fa-envelope text-success me-2"></i>{{i.user_id.email}}</span></h6>
+                                        <h6><span class="text-truncate me-3"><i class="fa-solid fa-phone text-success me-2"></i>{{i.user_id.contact}}</span></h6>
+                                        <span class="text-truncate me-3"><a href="{{i.user_id.file.url}}" download><i class="fa-solid fa-file me-2"></i>{{i.user_id.file}}</a></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
+                                    <div class="d-flex mb-3">
+                                        {% if i.status == "pending" %}
+                                        <form method="post" action="{% url 'applicationaccept' i.id %}">
+                                            {% csrf_token %}
+                                        <!-- <a class="btn btn-light btn-square me-3" href=""><i class="far fa-heart text-primary"></i></a> -->
+                                        
+                                        <input type="submit" name="action" value="Accept" class="btn btn-primary">
+                                        <input type="submit" name="action" value="Reject" class="btn btn-danger">
+                                        </form>
+                                        {% elif i.status == "Accepted" %}
+                                        <h5 class="text-success ">{{i.status}}</h5>
+                                        {% else %}
+                                        <h5 class="text-danger ">{{i.status}}</h5>
+                                        {% endif %}
+                                     
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+{% endblock %}
+<!-- </html> -->

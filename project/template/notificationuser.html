@@ -1,0 +1,45 @@
+<!-- <!DOCTYPE html>
+<html lang="en"> -->
+    {% extends 'userindex.html' %}
+    {% block content %}
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://kit.fontawesome.com/0d6c6c5ca8.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    
+    <div class="container-xxl py-5" id="joblist">
+        <div class="container">
+            <div class="d-flex justify-content-between  ">
+                <h1 class="text-center mb-5 wow fadeInUp " data-wow-delay="0.1s">Notifications</h1>
+                
+            </div>
+            {% for i in data %}
+            <div class="tab-class text-center wow fadeInUp" data-wow-delay="0.3s">
+                <div class="tab-content">
+                    <div id="tab-1" class="tab-pane fade show p-0 active">
+                        <div class="job-item p-4 mb-4">
+                            <div class="row g-4">
+                                <div class="col-sm-12 col-md-8 d-flex align-items-center">
+                                    <!-- <img class="flex-shrink-0 img-fluid border rounded" src="{% static 'img\com-logo-1.jpg' %}" alt="" style="width: 80px; height: 80px;"> -->
+                                    <div class="text-start ps-4">
+                                        <p class=" me-3 flex-wrap "><i class="fa-solid fa-message text-success  me-4"></i>{{i.notification}}</p>
+                                        
+                                    </div>
+                                </div>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+</body>
+{% endblock %}
+<!-- </html> -->

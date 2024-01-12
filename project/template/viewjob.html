@@ -1,0 +1,80 @@
+<!-- <!DOCTYPE html>
+<html lang="en"> -->
+    {% extends 'userindex.html' %}
+    {% block content %}
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://kit.fontawesome.com/0d6c6c5ca8.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    
+    
+    <div class="container-xxl py-5" id="joblist">
+        <div class="container">
+            <div class="d-flex justify-content-between  ">
+                <h1 class="text-center mb-5 wow fadeInUp " data-wow-delay="0.1s">Job Listing</h1>
+                <div class="d-flex justify-content-around ">
+                <form action="search" method="post">
+                    {% csrf_token %}
+                    <input type="search" name="search" style="height: 38px;width: 250px;">
+                    <input type="submit" class="btn btn-success ">
+                    </form>&nbsp;
+                    <a href="jobview"><input type="submit" value="all" class="btn btn-success "></a>
+                </div>
+            </div>
+            {% if message %}
+            <p class="h6">{{ message }}</p>
+            {% endif %}
+            {% if data1 %}
+            <p class="h6">{{ data1 }}</p>
+            {% endif %}
+            {% for i in data %}
+            <div class="tab-class text-center wow fadeInUp" data-wow-delay="0.3s">
+                <div class="tab-content">
+                    <div id="tab-1" class="tab-pane fade show p-0 active">
+                        <div class="job-item p-4 mb-4">
+                            <div class="row g-4">
+                                <div class="col-sm-12 col-md-8 d-flex align-items-center">
+                                    <!-- <img class="flex-shrink-0 img-fluid border rounded" src="{% static 'img\com-logo-1.jpg' %}" alt="" style="width: 80px; height: 80px;"> -->
+                                    <div class="text-start ps-4">
+                                        <h6 class="mb-3">Job Name : {{i.job_name}}</h6>
+                                        <h6>Company Name : {{i.company_id.companyname}}</h6>
+                                        <p>Description : {{i.job_description}}</p>
+                                        <span class="text-truncate me-3"><i class="fa-solid fa-envelope text-success me-2"></i>{{i.company_id.email}}</span>
+                                        <span class="text-truncate me-3"><i class="fa-solid fa-phone text-success me-2"></i>{{i.company_id.contact}}</span>
+                                        <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i>{{i.company_id.address}}</span>
+                                        
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
+                                    <div class="d-flex mb-3">
+                                        <div>
+                                        {% if i.id in data %}
+                                            <p class="h6">Already Applied</p>
+                                        {% else %}
+                                        </div>
+                                        <!-- <a class="btn btn-light btn-square me-3" href=""><i class="far fa-heart text-primary"></i></a> -->
+                                        <form action="application" method="post">
+                                            {% csrf_token %}
+                                            <input type="text" name="jobid" value="{{i.id}}" hidden>
+                                            <input type="submit" class="btn btn-success " value="Apply">
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    
+</body>
+{% endblock %}
+<!-- </html> -->
