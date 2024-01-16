@@ -48,7 +48,7 @@ urlpatterns = [
     path('viewapplication',views.viewapplication,name='viewapplication'),
     path('applicationaccept/<int:id>/', views.applicationaccept, name='applicationaccept'),
     path('notifications',views.notifications,name='notifications'),
-    path('notificationcom',views.notificationcom),
+    path('notificationcom',views.notificationcom,name='notificationcom'),
 
 ]
 if settings.DEBUG:

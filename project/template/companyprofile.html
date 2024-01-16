@@ -21,9 +21,15 @@
   }
   
   .user-card-full {
-      overflow: hidden;
-  }
-  
+    height: fit-content;
+}
+@media only screen and (max-width: 600px) {
+    .user-card-full {
+        height: 53rem;
+        max-width: 20rem;
+    /* margin-left:-10px; */
+}
+}
   .card {
       border-radius: 5px;
       -webkit-box-shadow: 0 1px 20px 0 rgba(69,90,100,0.08);
@@ -157,7 +163,7 @@
           <div class="padding">
               <div class="row container d-flex justify-content-center">
       <div class="col-xl-6 col-md-12" >
-          <div class="card user-card-full" style="width: 700px;height: 400px;">
+          <div class="card user-card-full" style="width: 700px;">
               <div class="row m-l-0 m-r-0" style="height: 600px;">
                   <div class="col-sm-4 bg-c-lite-green user-profile">
                       <div class="card-block text-center text-white">
