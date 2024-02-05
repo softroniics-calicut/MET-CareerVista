@@ -6,6 +6,7 @@ from .models import userreg,companyreg,job,application,notification
 from django.views.decorators.cache import cache_control
 from django.contrib.auth import authenticate,login as auth_login
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -80,37 +81,40 @@ def companyregistration(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def logins(request):
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-    context={'message':'Invalid User Credentials'}
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        context={'message':'Invalid User Credentials'}
 
-    admin_user = authenticate(request,username=username,password=password)
-    if admin_user is not None and admin_user.is_staff:
-        auth_login(request,admin_user)
-        return redirect('admin:index')
-    
-    if userreg.objects.filter(username=username,password=password).exists():
-        userdetail=userreg.objects.get(username=request.POST['username'], password=password)
-        if userdetail.password == request.POST['password'] and userdetail.status=='accepted':
-            request.session['uid'] = userdetail.id
-          
-
-            return render(request,'userindex.html')
-        else:
-            return render(request,'login.html',context)
+        admin_user = authenticate(request,username=username,password=password)
+        if admin_user is not None and admin_user.is_staff:
+            auth_login(request,admin_user)
+            return redirect('admin:index')
         
-    elif companyreg.objects.filter(username=username,password=password).exists():
-        userdetail=companyreg.objects.get(username=request.POST['username'], password=password)
-        if userdetail.password == request.POST['password'] and userdetail.status=='accepted':
-            request.session['cid'] = userdetail.id
+        if userreg.objects.filter(username=username,password=password).exists():
+            userdetail=userreg.objects.get(username=request.POST['username'], password=password)
+            if userdetail.password == request.POST['password'] and userdetail.status=='accepted':
+                request.session['uid'] = userdetail.id
+            
+
+                return redirect(userindex)
+            else:
+                return render(request,'login.html',context)
+            
+        elif companyreg.objects.filter(username=username,password=password).exists():
+            userdetail=companyreg.objects.get(username=request.POST['username'], password=password)
+            if userdetail.password == request.POST['password'] and userdetail.status=='accepted':
+                request.session['cid'] = userdetail.id
 
 
-            return render(request,'companyindex.html')
+                return redirect(companyindex)
+            else:
+                return render(request,'login.html',context)
+            
         else:
-            return HttpResponse("Invalid User Credentials")
-        
+            return render(request, 'login.html',{'status': 'Invalid Username or Password'})
     else:
-        return render(request, 'login.html', {'status': 'Invalid Username or Password'})
+        return render(request,'login.html')
     
 
 
@@ -127,42 +131,49 @@ def logout(request):
 
 
 # user..................................................
-
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def userprofile(request):
-    tem=request.session['uid']
-    vpro=userreg.objects.get(id=tem)
-    return render(request,'userprofile.html',{'result':vpro})
-
+    if 'uid' in request.session:
+        tem=request.session['uid']
+        vpro=userreg.objects.get(id=tem)
+        return render(request,'userprofile.html',{'result':vpro})
+    else:
+        return redirect(logins)
 
 
 def userprofileedit(request):
     return render(request,'userprofileedit.html')
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def updat(request,id):
-    upt=userreg.objects.get(id=id)
-    return render(request,'userprofileedit.html',{'result':upt})
+    if 'uid' in request.session:
+        upt=userreg.objects.get(id=id)
+        return render(request,'userprofileedit.html',{'result':upt})
+    else:
+        return redirect(logins)
 
 def updates(request,id):
     user = userreg.objects.get(id=id)
     if request.method=="POST":
         user.name=request.POST.get('name')
-        user.address = request.POST.get('address')
         user.contact=request.POST.get('contact')
         user.email=request.POST.get('email') 
         if 'file' in request.FILES:
             user.file = request.FILES('file')
-        user.experiance=request.POST.get('experiance')
         user.username = request.POST.get('username')
         user.password=request.POST.get('password')
         user.save()
         return redirect(userprofile)
     
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def jobview(request):
-    if request.method == "GET":
-        data = job.objects.all().order_by('-id')
-        return render(request,'viewjob.html',{'data':data})
+    if 'uid' in request.session:
+        if request.method == "GET":
+            data = job.objects.all().order_by('-id')
+            return render(request,'viewjob.html',{'data':data})
+    else:
+        return redirect(logins)
     
 
 def search(request):
@@ -171,7 +182,7 @@ def search(request):
     data = job.objects.filter(job_name=search)
     return render(request,'viewjob.html',{'data':data})
   
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def applications(request):
     id=request.session['uid']
     if request.method=="POST":
@@ -193,6 +204,7 @@ def applications(request):
         data1.save()     
     return render(request,'viewjob.html',context)
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def appliedjobs(request):
     if 'uid' in request.session:
         id=request.session['uid']
@@ -200,42 +212,42 @@ def appliedjobs(request):
         data = application.objects.filter(user_id=user).order_by('-id')
         return render(request,'appliedjobs.html',{'data':data})
     else:
-        return HttpResponse("error")
+        return redirect(logins)
 
 
-# def addfeedback(request,id):
-#     ids=request.session['uid']
-#     if request.method == 'POST':
-#         feedback= request.POST.get('feedback')
-#         user =userreg.objects.get(id=ids)
-#         jobs = application.objects.get(id=id)
-#         company = job.objects.get(id=jobs.job.company_id.id)
-#         data = feedback_details.objects.create(feedback=feedback,user_id=user,company_id=company)
-#         data.save()
-#     return redirect(appliedjobs)
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def notifications(request):
-    notificationss = notification.objects.all().order_by('-id')
-    return render(request,'notificationuser.html',{'data':notificationss})
+    if 'uid' in request.session:
+        notificationss = notification.objects.all().order_by('-id')
+        return render(request,'notificationuser.html',{'data':notificationss})
+    else:
+        return redirect(logins)
 
 
 
 # company......................................
     
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def companyprofile(request):
-    tem=request.session['cid']
-    vpro=companyreg.objects.get(id=tem)
-    return render(request,'companyprofile.html',{'result':vpro})
+    if 'cid' in request.session:
+        tem=request.session['cid']
+        vpro=companyreg.objects.get(id=tem)
+        return render(request,'companyprofile.html',{'result':vpro})
+    else:
+        return redirect(logins)
 
 
 def companyprofileedit(request):
     return render(request,'companyprofileedit.html')
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def companyupdat(request,id):
-    upt=companyreg.objects.get(id=id)
-    return render(request,'companyprofileedit.html',{'result':upt})
+    if 'cid' in request.session:
+        upt=companyreg.objects.get(id=id)
+        return render(request,'companyprofileedit.html',{'result':upt})
+    else:
+        return redirect(logins)
 
 def companyupdates(request,id):
     if request.method=="POST":
@@ -250,30 +262,38 @@ def companyupdates(request,id):
         return redirect(companyprofile)
     
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def addjob(request):
-    if request.method=="POST":
-        tem=request.session['cid']
-        job_name = request.POST.get('jobname')
-        job_description = request.POST.get('description')
-        context = {
-            'data':"Added successfully"
-        }
+    if 'cid' in request.session:
+        if request.method=="POST":
+            tem=request.session['cid']
+            job_name = request.POST.get('jobname')
+            job_description = request.POST.get('description')
+            context = {
+                'data':"Added successfully"
+            }
 
-        data1 = companyreg.objects.get(id=tem)
-        if data1:
-            data = job.objects.create(company_id=data1,job_name=job_name,job_description=job_description)
-            data.save()
-            return render(request,'addjobcompany.html',context)
+            data1 = companyreg.objects.get(id=tem)
+            if data1:
+                data = job.objects.create(company_id=data1,job_name=job_name,job_description=job_description)
+                data.save()
+                return render(request,'addjobcompany.html',context)
+            else:
+                return HttpResponse("error")
         else:
-            return HttpResponse("error")
+            return render(request,'addjobcompany.html')
     else:
-        return render(request,'addjobcompany.html')
+        return redirect(logins)
     
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def managejob(request):
-    tem=request.session['cid']
-    vpro=job.objects.filter(company_id=tem).order_by('-id')
-    return render(request,'managejob.html',{'result':vpro})
+    if 'cid' in request.session:
+        tem=request.session['cid']
+        vpro=job.objects.filter(company_id=tem).order_by('-id')
+        return render(request,'managejob.html',{'result':vpro})
+    else:
+        return redirect(logins)
 
 
 def editjob(request,id):
@@ -295,16 +315,21 @@ def deletejob(request, id):
         job_of_company = job.objects.get(company_id=company, id=id)
         job_of_company.delete()
         return redirect(managejob)
-    
-def viewapplication(request):
-    company_id = request.session.get('cid')
-    applications = None
-    if company_id:
-        company = companyreg.objects.get(id=company_id)
-        jobs_of_company = job.objects.filter(company_id=company)
-        applications = application.objects.filter(job__in=jobs_of_company).order_by('-id')
 
-    return render(request, 'viewapplication.html', {'data': applications})
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True) 
+def viewapplication(request):
+    if 'cid' in request.session:
+        company_id = request.session.get('cid')
+        applications = None
+        if company_id:
+            company = companyreg.objects.get(id=company_id)
+            jobs_of_company = job.objects.filter(company_id=company)
+            applications = application.objects.filter(job__in=jobs_of_company).order_by('-id')
+
+        return render(request, 'viewapplication.html', {'data': applications})
+    else:
+        return redirect(logins)
 
 
 def applicationaccept(request, id):
@@ -320,6 +345,10 @@ def applicationaccept(request, id):
     return redirect(viewapplication) 
     
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def notificationcom(request):
-    notificationss = notification.objects.all().order_by('-id')
-    return render(request,'notificationcompany.html',{'data':notificationss})
+    if 'cid' in request.session:
+        notificationss = notification.objects.all().order_by('-id')
+        return render(request,'notificationcompany.html',{'data':notificationss})
+    else:
+        return redirect(logins)
