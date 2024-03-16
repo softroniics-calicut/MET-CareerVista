@@ -26,8 +26,7 @@ def companyindex(request):
 
 
 
-# def regcompany(request):
-#     return render(request,'registrationcompany.html')
+
 
 
 
@@ -99,7 +98,7 @@ def logins(request):
 
                 return redirect(userindex)
             else:
-                return render(request,'login.html',context)
+                return render(request,'login.html',{'message':'wait for admin approval'})
             
         elif companyreg.objects.filter(username=username,password=password).exists():
             userdetail=companyreg.objects.get(username=request.POST['username'], password=password)
@@ -109,10 +108,10 @@ def logins(request):
 
                 return redirect(companyindex)
             else:
-                return render(request,'login.html',context)
+                return render(request,'login.html',{'message':'wait for admin approval'})
             
         else:
-            return render(request, 'login.html',{'status': 'Invalid Username or Password'})
+            return render(request, 'login.html',{'message': 'Invalid Username or Password'})
     else:
         return render(request,'login.html')
     

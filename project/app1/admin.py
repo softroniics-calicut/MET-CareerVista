@@ -88,3 +88,4 @@ admin.site.register(job,JobAdmin)
 admin.site.register(application,ApplicationAdmin)
 admin.site.register(notification)
 
+admin.site.site_header= 'CAREER VISTA'
